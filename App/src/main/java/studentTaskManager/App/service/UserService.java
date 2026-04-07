@@ -21,4 +21,9 @@ public class UserService {
     public Optional<AppUser> getUserById(Long id){
         return storage.users.stream().filter(user->user.getId().equals(id)).findFirst();
     }
+
+    public Optional<AppUser> getUserByName(String name){
+        return storage.users.stream().filter(u->u.getUsername().equals(name)).findFirst();
+    }
+
 }
