@@ -2,6 +2,7 @@ package studentTaskManager.App.securityConfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -24,7 +25,9 @@ public class SecurityConfig{
                 .authorizeHttpRequests(auth ->auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/tasks/**").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/tasks/my").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/tasks").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/tasks").hasAnyRole("ADMIN","USER")
                         .anyRequest().authenticated()
                 ).httpBasic(httpBasic -> httpBasic.realmName("StudentTaskManager"));
         return http.build();
