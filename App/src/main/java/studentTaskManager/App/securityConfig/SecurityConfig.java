@@ -28,6 +28,7 @@ public class SecurityConfig{
                         .requestMatchers(HttpMethod.GET,"/tasks/my").hasAnyRole("USER","ADMIN")
                         .requestMatchers(HttpMethod.GET,"/tasks").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.POST,"/tasks").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.DELETE,"/tasks/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 ).httpBasic(httpBasic -> httpBasic.realmName("StudentTaskManager"));
         return http.build();

@@ -33,4 +33,14 @@ public class TaskService {
         storage.tasks.add(task);
         return task;
     }
+
+    public Task deleteTask(Long id){
+        for (Task t : storage.tasks){
+            if(t.getId().equals(id)){
+                storage.tasks.remove(t);
+                return t;
+            }
+        }
+        return null;
+    }
 }
