@@ -2,8 +2,11 @@ package studentTaskManager.App.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import studentTaskManager.App.dtos.UserDTO;
 import studentTaskManager.App.model.AppUser;
-import studentTaskManager.App.testData.InMemoryStorage;
+import studentTaskManager.App.model.Role;
+import studentTaskManager.App.repositories.AppUserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,18 +15,33 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserService {
 
-    private final InMemoryStorage storage;
+    private final AppUserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<AppUser> getAllUsers(){
-        return storage.users;
+        return userRepository.findAll();
     }
 
     public Optional<AppUser> getUserById(Long id){
-        return storage.users.stream().filter(user->user.getId().equals(id)).findFirst();
+        return userRepository.findById(id);
     }
 
     public Optional<AppUser> getUserByName(String name){
-        return storage.users.stream().filter(u->u.getUsername().equals(name)).findFirst();
+        return userRepository.findByUsername(name);
     }
 
+    public AppUser createUser(UserDTO userdto){
+
+        if(userRepository.findByUsername(userdto.getUsername()).isPresent()){
+            throw new RuntimeException("User already exists");
+        }
+
+        AppUser user = AppUser.builder()
+                .username(userdto.getUsername())
+                .password(passwordEncoder.encode(userdto.getPassword()))
+                .role(Role.ROLE_USER)
+                .build();
+
+        return userRepository.save(user);
+    }
 }
