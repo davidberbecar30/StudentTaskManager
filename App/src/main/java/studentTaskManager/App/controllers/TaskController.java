@@ -8,7 +8,6 @@ import studentTaskManager.App.dtos.TaskDTO;
 import studentTaskManager.App.model.Task;
 import studentTaskManager.App.service.TaskService;
 import studentTaskManager.App.service.UserService;
-import studentTaskManager.App.testData.InMemoryStorage;
 
 import java.util.List;
 
@@ -43,8 +42,11 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Task> deleteTask(@PathVariable Long id){
-        Task removed=taskService.deleteTask(id);
+    public ResponseEntity<Task> deleteTask(@PathVariable Long id) {
+        Task removed = taskService.deleteTask(id);
+        if (removed == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().body(removed);
     }
 }
