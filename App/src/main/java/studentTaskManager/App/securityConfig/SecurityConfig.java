@@ -20,9 +20,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(401);
+                        })
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/tasks/my").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/tasks").hasRole("ADMIN")
@@ -31,7 +35,17 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(customUserDetailService)
-                .httpBasic(httpBasic -> httpBasic.realmName("StudentTaskManager"));
+                .formLogin(form -> form
+                        .loginProcessingUrl("/auth/login")
+                        .successHandler((req, res, auth) -> res.setStatus(200))
+                        .failureHandler((req, res, ex) -> res.setStatus(401))
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .logoutSuccessHandler((req, res, auth) -> res.setStatus(200))
+                );
         return http.build();
     }
 }
