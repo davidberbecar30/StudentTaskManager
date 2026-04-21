@@ -9,6 +9,7 @@ A Spring Boot-based REST API for managing tasks, featuring JWT-based authenticat
 - **Role-Based Access Control:** Differentiated access for `USER` and `ADMIN` roles.
 - **Swagger Documentation:** Integrated OpenAPI 3.0 documentation.
 - **Security:** CSRF protection disabled (stateless), JWT filter for authenticated requests.
+- **Dockerized Deployment:** Multi-container setup with Docker and Docker Compose for the app and PostgreSQL database, with persistent volume storage.
 
 ## Security & Authentication
 
@@ -25,6 +26,47 @@ The application uses **JWT (JSON Web Token)** for stateless authentication.
 
 
 ## Getting Started
+
+The recommended way to run the project is via Docker Compose, which spins up the Spring Boot app and a PostgreSQL database together.
+
+### Prerequisites
+- Docker and Docker Compose installed.
+
+### Running with Docker Compose
+
+From inside the `App/` folder (where the `Dockerfile` and `docker-compose.yml` live):
+
+```bash
+docker compose up --build
+```
+
+This will:
+1. Pull the `postgres:16` image from Docker Hub.
+2. Build the Spring Boot app image using the `Dockerfile`.
+3. Start both containers on a shared private network.
+4. Expose the API on `http://localhost:8080` and PostgreSQL on `localhost:5432`.
+
+To stop everything:
+
+```bash
+docker compose down
+```
+
+To stop and also wipe the database:
+
+```bash
+docker compose down -v
+```
+
+### Configuration
+
+The `docker-compose.yml` overrides the database connection via environment variables, so the app inside the container connects to the `postgres` service on the Docker network instead of `localhost`. The default credentials (for local development) are:
+
+- Database: `studenttaskmanager`
+- Username: `davidberbecar`
+- Password: `1234`
+
+PostgreSQL data is persisted in a Docker-managed named volume (`postgres-data`), so your tables and data survive container restarts.
 
 ## API Endpoints
 
@@ -90,3 +132,4 @@ The project includes:
 - **Lombok** (Boilerplate reduction)
 - **Maven** (Build tool)
 - **SpringDoc OpenAPI (Swagger UI)**
+- **Docker** & **Docker Compose** (Containerization and orchestration)
